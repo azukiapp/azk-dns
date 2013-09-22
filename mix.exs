@@ -12,6 +12,11 @@ defmodule AzkDns.Mixfile do
   def application do
     [
       mod: { AzkDns.App, [] },
+      env: [
+        azkdns_address: {:from_env, :AZKDNS_ADDRESS, "udp://localhost:8053"},
+        azkdns_domains: {:from_env, :AZKDNS_DOMAINS, "dev.azk.io,azk"},
+        azkdns_resvto:  {:from_env, :AZKDNS_RESVTO , "127.0.0.1"},
+      ]
     ]
   end
 

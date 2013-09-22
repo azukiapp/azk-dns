@@ -8,7 +8,8 @@ defmodule AzkDns.Supervisor do
   def init([]) do
     children = [
       # Define workers and child supervisors to be supervised
-      supervisor(AzkDns.LookupSup, [])
+      supervisor(AzkDns.LookupSup, []),
+      worker(AzkDns, [])
     ]
 
     # See http://elixir-lang.org/docs/stable/Supervisor.Behaviour.html
