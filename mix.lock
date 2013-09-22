@@ -1,0 +1,2 @@
+[ "meck": {:git, "git://github.com/eproxus/meck.git", "1286aba1cb6bbd6c9fc3f817740758b224843ee7", [{:tag, "0.8.1"}]},
+  "mock": {:git, "git://github.com/jjh42/mock.git", "e54a8f8ac3b69b5a610399f7fb5efe65446526eb", []} ]
