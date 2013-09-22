@@ -7,10 +7,10 @@ defmodule AzkDns.Lookup.Test do
   test "reply with nxdomain if domain can not found" do
     opts   = Options.new("127.0.0.1", "dev")
     domain = "test.dev.io"
-    mocks  = mock_send(message(domain, 3))
+    mocks  = mock_send(message(domain, [], [rcode: 3]))
 
     with_mock :gen_udp, [:unstick], mocks do
-      {:ok, _} = Lookup.lookup(:socket, :ip, :port, message(domain), opts)
+      {:ok, _} = Lookup.lookup(:socket, :ip, :port, message(domain, []), opts)
       assert_receive :sended
       assert called :gen_udp.send(:socket, :ip, :port, :_)
     end
@@ -23,10 +23,11 @@ defmodule AzkDns.Lookup.Test do
         type: :a, domain: '#{domain}', class: :in,
         ttl: 300, data: {127, 0, 0, 1}
       )
-      mocks  = mock_send(message(domain, [rr], 0))
+      header = [qr: true, aa: true, rd: true, ra: true]
+      mocks  = mock_send(message(domain, [rr], header))
 
       with_mock :gen_udp, [:unstick], mocks do
-        {:ok, _} = Lookup.lookup(:socket, :ip, :port, message(domain), opts)
+        {:ok, _} = Lookup.lookup(:socket, :ip, :port, message(domain, []), opts)
         assert_receive :sended
         assert called :gen_udp.send(:socket, :ip, :port, :_)
       end
@@ -43,13 +44,9 @@ defmodule AzkDns.Lookup.Test do
     end]
   end
 
-  def message(domain, rcode // 0) do
-    message(domain, [], rcode)
-  end
-
-  def message(domain, anlist, rcode) do
+  def message(domain, anlist, header // []) do
     query  = {:dns_query, '#{domain}', :a, :in}
-    header = [opcode: :query, rd: true, rcode: rcode]
+    header = Keyword.merge([opcode: :query, rd: true, rcode: 0], header)
     :inet_dns.encode(:inet_dns.make_msg(
       header: :inet_dns.make_header(header),
       qdlist: [query],
